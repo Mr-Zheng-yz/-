@@ -1,0 +1,363 @@
+## 一、FlexboxLayout是什么
+FlexboxLayout是Google开源的一个强大的控件，直接继承ViewGroup，效果类似于加强版的LinearLayout，但与LinearLayout并无关联。
+
+官方原话是：
+> FlexboxLayout is a library project which brings the similar capabilities of CSS Flexible Box Layout Module to Android.
+> 意思是：FlexBoxLayout是为Android带来了与 [CSS Flexible Box Layout](https://www.w3.org/TR/css-flexbox-1/)（CSS 弹性盒子）相似功能的库。
+
+Github地址：https://github.com/google/flexbox-layout
+
+## 二、如何使用FlexboxLayout
+FlexBoxLayout有非常多的属性，下面一一验证各个属性的作用
+
+### 引用依赖
+```
+dependencies {
+    implementation 'com.google.android:flexbox:1.1.0'
+}
+```
+
+### 在布局中简单使用
+```
+<com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:flexWrap="wrap">
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="推送和即时通讯"/>
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="蓝牙" />
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="程序员"/>
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="影视天堂" />
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="郭德纲" />
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="旅行——在路上" />
+
+        <TextView
+            style="@style/TextStyle"
+            android:text="复仇者联盟4" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+```
+TextStyle如下:
+```
+ <style name="TextStyle">
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/shape_pink_border</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+```
+shape_pink_border文件：
+```
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="8dp"/>
+    <stroke android:width="1dp" android:color="@android:color/holo_red_light"/>
+</shape>
+```
+运行看一下效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190514175032267.png)
+可以看到内容虽然出来了，但都挤在同一行了，这显然并不是我要的效果。
+
+那么接下来就该FlexboxLayout属性们出来救场了：
+
+## 三、FlexboxLayout属性介绍
+### FlexboxLayout直接属性
+#### 1. app:flexWrap="nowrap"
+简单来说，该属性表示是否换行和换行的方向。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/201905141757008.png)
+由上图可见，flexWrap属性一共有三个枚举值，分别是`nowrap`、`wrap`和`wrap_reverse`
+
+- `nowrap`:单行显示，不换行，默认就是这个属性。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190514175032267.png)
+- `wrap`：当内容超过一行时，自动换行。效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190514180738599.png)
+- `wrap_reverse` ：反向换行（下一行内容在当前行之上）
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190514180954962.png)
+#### 2. app:flexDirection="row"
+该属性表示主轴的方向，子元素的排列按照轴线方向依次添加。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515095235856.png)
+再看一下源码，可见flexDirection的枚举值有`row`和`row_reverse`，`column`和`column_reverse`
+
+- `row` : 主轴方向按水平（行）方向排版，默认就是这个属性。效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515095621148.png)
+- `row_reverse` : 主轴方向按水平（行）方向反向排版。效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515095736422.png)
+由效果图可见，`row`是从左向右绘制，`row_reverse`是row的反向，也就是从右向左绘制啦。同理`column`也是一样。
+
+- `column` : 主轴方向按竖直（列）方向排版。效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515100250134.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `column_reverse` : 主轴方向按竖直（列）方向反向排版（从下向上）。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515100338678.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+#### 3. app:justifyContent="flex_start"
+关于这个属性，官方有一段说明：
+> `
+		<!--
+            Omitting flex-flow property since it's reflected in the parent flex container.
+            Set the flexDirection and/or flexWrap to the parent flex container explicitly if you
+            want to use the flex-flow similar way to the web.
+         -->
+`
+
+作用是控制元素在主轴上的对齐方式，需要配合`flexDirection`或`flexWrap `属性来使用。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019051510173578.png)
+看一下源码，可见`app:justifyContent`属性有`flex_start`、`flex_end`、`center`、`space_between`、`space_around`和`space_evenly`6个枚举值。
+
+下面把以上两个属性改为：
+```
+		app:flexWrap="wrap"
+        app:flexDirection="row"
+```
+来看效果。
+
+- `flex_start`: 左对齐，默认值。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515095621148.png)
+- `flex_end` : 右对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515102427865.png)
+- `center`：居中对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515102542345.png)
+- `space_between`: 两端对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515102729865.png)
+
+- `space_around` : 分散对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515102815495.png)
+
+
+- `space_evenly`:子元素在一行内均匀分布空间。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515102859538.png)
+
+#### 4. app:alignItems="stretch"
+该属性表示元素在`每条轴线`上的对齐方式。
+
+> ***注意***：如果设置了`alignContent`，且值不为stretch,那么该属性失效。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515104039887.png)
+`app:alignItems`属性有`flex_start`、`flex_end`、`center`、`baseline`和`stretch`
+
+下面把FlexBoxLayout指定一个高度，并为TextView添加不同的padding来看效果。
+
+- `stretch`: 默认值，如果子元素未设置高度，则沾满父布局高度。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515104747671.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `flex_start` :顶端对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515105529325.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `flex_end` :底端对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515105605583.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+-  `center` : 居中对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515105648629.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `baseline` :按照第一个元素的基线对齐。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515105909488.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+
+下面这张图片可以很直观的表达这个属性的作用。[图片来源](https://www.oschina.net/news/73442/google-flexbox-layout)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515105059606.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+#### 5. app:alignContent="stretch"
+该属性表示`每条轴线`在整个布局中的对齐方式。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515110558455.png)
+app:alignContent属性有`flex_start`、`flex_end`、`center`、`space_between`、`space_around`和`stretch`6个枚举值。
+
+- `stretch`:默认值，轴线占满整个父布局。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515104747671.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `flex_start`:顶部对齐所有轴线。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515111036674.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `flex_end`:底部对齐所有轴线。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515111112984.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `center`:居中对齐所有轴线。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515111153840.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+- `space_between`:两端对齐所有轴线。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019051511123743.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+
+- `space_around`:分散对齐所有轴线。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515111305405.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+插一句嘴，轴线方向可以由`flexDirection`属性来指定，注意属性搭配，举一反三。
+
+#### 6. dividerDrawable （reference）
+水平和竖直方向分割线。
+#### 7. dividerDrawableHorizontal  / dividerDrawableVertical （reference）
+水平/竖直方向分割线。
+
+#### 8. showDivider
+显示水平和竖直方向分割线方式。
+枚举值有：
+- `none`
+不显示。
+
+- `beginning`
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019051515100723.png)
+- `middle`
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515150934198.png)
+- `end`
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515151039167.png)
+
+#### 9. showDividerHorizontal / showDividerVertical
+显示水平/竖直方向分割线方式。
+
+### FlexboxLayout子元素属性
+#### 1. app:layout_order="1"
+指定子元素排序优先级，值越小越排在前面，默认值为1。设置值类型为float。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515134907256.png)
+如图，**蓝牙**TextView元素在xml中排序为第二个，但给它的`layout_order`属性指定为2，**蓝牙**排名到最后一位了。
+
+#### 2. app:layout_flexGrow="0"
+分配同一轴线剩余控件所占权重，默认值为0，表示不参与分配。用法类似于**LinearLayout**的`weight`，不过weight分配的是整个父布局控件，而`layout_flexGrow`分配的是同一行/列的剩余空间。
+
+举个例子：将**蓝牙**的`layout_flexGrow`设为1，**程序**的`layout_flexGrow`属性设为2
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019051513575819.png)
+如图，**蓝牙**与**程序**都参与到了剩余空间分配，由于**程序**设置的权重为2，所以比**蓝牙**多分配了一倍的空间。
+
+#### 3. app:layout_flexShrink="0"
+子元素缩放比例，如果设置了换行（flexWrap="wrap或wrap_reverse"）则该属性无效。
+设置值类型为float，0表示不缩放，数值越大，缩放比例越大，默认为1，负值无效。
+
+例子：**推送和即时通讯**设置为0(不缩放)，**旅行——在路上**设置为2（双倍缩放）
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515140905798.png)
+#### 4. app:layout_flexBasisPercent="-1"
+官方解释：
+```
+	<!--
+            The initial length in a percentage format relative to its parent. This is similar to the
+            flex-basis property in the original CSS specification.
+            (https://www.w3.org/TR/css-flexbox-1/#flex-basis-property)
+            But unlike the flex-basis property, this attribute only accepts a value in fraction
+            (percentage), whereas flex-basis property accepts width values such as 1em, 10px and
+            the 'content' string.
+            But specifying initial fixed width values can be done by specifying width values in
+            layout_width (or layout_height, varies depending on the flexDirection). Also the same
+            effect can be done by specifying "wrap_content" in layout_width (or layout_height) if
+            developers want to achieve the same effect as 'content'.
+            Thus, this attribute only accepts fraction values, which can't be done through
+            layout_width (or layout_height) for simplicity.
+        -->
+```
+
+表示子元素长度是其父布局长度的百分比，设置了元素的`layout_flexBasisPercent`将覆盖子元素原本长度，默认值为-1。要注意的是，只有具体设置了父布局的长度才能生效。
+设置的值为百分数，例如50%。
+
+例子：将第一个元素宽度设置为父布局的50%（`app:layout_flexBasisPercent="50%"`）。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515142713732.png)
+#### 5. app:layout_alignSelf="auto"
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515143048556.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+所用与`alignItems`属性一样，不同点是`alignItems`设置的是所有元素，而`layout_alignSelf`作用于单个元素。
+
+需要注意的一点是，若父布局设置了`alignContent`，并且枚举值不为`stretch`，则改属性失效。
+
+`layout_alignSelf`的枚举值有`auto`,`flex_start`,`flex_end`，`center`，`baseline`和`stretch`，作用与`alignItems`属性相同。
+
+例子：将**推送和即时通讯**设置为flex_start，蓝牙的**layout_alignSelf**设置为stretch。效果：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2019051514414988.png)
+#### 6.app:layout_wrapBefore="false"
+强制换行，默认为false。
+若为子元素设置了`layout_wrapBefore`属性为false，那么这个子元素将重新另起一行。
+
+例：为**蓝牙**设置`layout_wrapBefore`属性为true
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515145617180.png)
+#### 7. layout_minWidth / layout_minHeight
+限制 FlexboxLayout的子元素（宽或高）不会小于最小值，无论`layout_flexShrink`属性为多少，子元素不会被缩小到小于设置的这个最小值。
+
+#### 8. layout_maxWidth / layout_maxHeight
+限制 FlexboxLayout的子元素（宽或高）不会大于最小值，无论`layout_flexGrow`属性为多少，子元素不会被放大到大于于设置的这个最小值。
+
+
+### 小结
+FlexBoxLayout的常用属性就这么多了，灵活运用这些属性的搭配可以达到非常灵活的效果。
+
+## 四、与RecyclerView配合使用 
+官方不仅提供了`FlexboxLayout`布局，还提供了`FlexboxLayoutManager `来与`RecyclerView`配合使用。
+> The second one is FlexboxLayoutManager that can be used within RecyclerView.
+
+虽然**RecyclerView**之前也有`StaggeredGridLayoutManager`来提供瀑布流效果，但还是要指定行/列数、相比之下，`FlexboxLayoutManager `更加灵活，且应用场景也不尽相同。
+
+下面将RecyclerView的layoutManager设置成`FlexboxLayoutManager`
+先看一下效果:
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190515121152189.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+白色背景为设置了**FlexboxLayoutManager**的RecyclerView，绿色背景为FlexboxLayout，可见`FlexboxLayoutManager`y与`FlexboxLayout`可以达到相同的效果。
+
+主要代码：
+```
+		val flexboxLayoutManager = FlexboxLayoutManager(this)
+        flexboxLayoutManager.flexWrap = FlexWrap.WRAP
+        flexboxLayoutManager.flexDirection = FlexDirection.ROW
+        flexboxLayoutManager.justifyContent = JustifyContent.FLEX_START
+        flexboxLayoutManager.alignItems = AlignItems.FLEX_START
+		//flexboxLayoutManager.alignContent = AlignContent.FLEX_START
+
+        val adapter = FlexAdapter()
+        initData(adapter)
+        rv_flex.layoutManager = flexboxLayoutManager
+        rv_flex.adapter = adapter
+```
+> ***注意***：flexboxLayoutManager.alignContent，`FlexboxLayoutManager`不支持alignContent 属性
+
+看一下setAlignContent的源码：
+```
+	@Override
+    public void setAlignContent(@AlignContent int alignContent) {
+        throw new UnsupportedOperationException("Setting the alignContent in the "
+                + "FlexboxLayoutManager is not supported. Use FlexboxLayout "
+                + "if you need to use this attribute.");
+    }
+```
+可见，`FlexboxLayoutManager`不支持alignContent 属性，如果强行设置则会报出以下异常。
+
+```
+Caused by: java.lang.UnsupportedOperationException: Setting the alignContent in the FlexboxLayoutManager is not supported. Use FlexboxLayout if you need to use this attribute.
+```
+
+[Demo源码](https://gitee.com/zhengyz_0430/JetPackFirstDemo)
+
+那么`FlexboxLayoutManager`和`FlexboxLayout `还有哪些使用的不同呢？官方这张表给出了很好地说明。
+
+|Attribute / Feature | FlexboxLayout | FlexboxLayoutManager (RecyclerView)|
+|--|--|--|
+| flexDirection | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| flexWrap | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png)（except `wrap_reverse`） |
+| justifyContent | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| alignItems | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| alignContent | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | - |
+| layout_order | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | - |
+| layout_flexGrow | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_flexShrink | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_alignSelf | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_flexBasisPercent  | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_(min/max)Width  | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_(min/max)Height  | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| layout_wrapBefore | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| Divider  | ![](https://img-blog.csdnimg.cn/20190515122352736.png) | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| View recycling  | - | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+| Scrolling  | *1 | ![](https://img-blog.csdnimg.cn/20190515122352736.png) |
+
+## 五、实践
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190514164120744.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTM5NzQ3MQ==,size_16,color_FFFFFF,t_70)
+这样的流失布局，如果在项目中碰到，貌似只能自定义View，或者寻求别人写好的库了。
+但有了FlexboxLayout之后可以完美解决。
+
+## 六、总结
+> 空谈误国，实干兴邦
+
+要真想理解**FlexboxLayout**的各个属性，自己实践和阅读源码是必不可少的，话不多说，还是多多动手实践吧。
+
+FlexboxLayout与FlexboxLayoutManager可以完美实现灵活的流式布局，并且该库已经添加到androidX了，Google大大为我们的开发真是操碎了心啊。
+
+### 参考
+https://blog.csdn.net/tabolt/article/details/51799226
+https://www.jianshu.com/p/3c471953e36d
+https://www.oschina.net/news/73442/google-flexbox-layout
